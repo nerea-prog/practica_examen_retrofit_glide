@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
     private fun observarViewModel() {
         viewModel.llista.observe(this) { llista ->
             adapter.update(llista)
-            tvInfo.text = "${llista.size} usuaris carregats de reqres.in"
+            tvInfo.text = "${llista.size} usuaris carregats"
         }
 
         viewModel.isLoading.observe(this) { loading ->

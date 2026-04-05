@@ -1,8 +1,5 @@
 package com.example.glide.network
 
-import com.example.glide.model.CreateResponse
-import com.example.glide.model.UpdateResponse
-import com.example.glide.model.UserRequest
 import com.example.glide.model.User
 import retrofit2.Response
 import retrofit2.http.*
@@ -13,23 +10,14 @@ interface UsersService {
     suspend fun getLlista(): Response<List<User>>
 
     @GET("users/{id}")
-    suspend fun getUsuari(
-        @Path("id") id: Int
-    ): Response<User>
+    suspend fun getUsuari(@Path("id") id: String): Response<User>
 
     @POST("users")
-    suspend fun crearUsuari(
-        @Body userRequest: UserRequest
-    ): Response<CreateResponse>
+    suspend fun crearUsuari(@Body user: User): Response<User>
 
     @PUT("users/{id}")
-    suspend fun actualitzarUsuari(
-        @Path("id") id: Int,
-        @Body userRequest: UserRequest
-    ): Response<UpdateResponse>
+    suspend fun actualitzarUsuari(@Path("id") id: String, @Body user: User): Response<User>
 
     @DELETE("users/{id}")
-    suspend fun eliminarUsuari(
-        @Path("id") id: Int
-    ): Response<Unit>
+    suspend fun eliminarUsuari(@Path("id") id: String): Response<Unit>
 }

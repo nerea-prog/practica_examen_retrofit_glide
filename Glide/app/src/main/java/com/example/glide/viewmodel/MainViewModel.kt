@@ -40,7 +40,7 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun eliminar(id: Int) {
+    fun eliminar(id: String) {
         viewModelScope.launch {
             try {
                 val response = repo.eliminar(id)

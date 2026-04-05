@@ -1,7 +1,7 @@
 package com.example.glide.viewmodel
 
 import androidx.lifecycle.*
-import com.example.glide.model.UserRequest
+import com.example.glide.model.User
 import com.example.glide.repository.UserRepository
 import kotlinx.coroutines.launch
 
@@ -12,7 +12,6 @@ class FormViewModel : ViewModel() {
     private val _isLoading = MutableLiveData(false)
     private val _error     = MutableLiveData<String?>()
     private val _missatge  = MutableLiveData<String?>()
-    // Guardem el resultat com a String per mostrar-lo a la UI
     private val _resultat  = MutableLiveData<String?>()
 
     val isLoading: LiveData<Boolean> = _isLoading
@@ -20,23 +19,16 @@ class FormViewModel : ViewModel() {
     val missatge:  LiveData<String?> = _missatge
     val resultat:  LiveData<String?> = _resultat
 
-    // ── CAS 4: POST — Crear usuari nou ────────────────────────────────────
-    fun crear(nom: String, feina: String) {
+    fun crear(nom: String, cognom: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val request = UserRequest(name = nom, job = feina)
-                val response = repo.crear(request)
+                val user = User(nom = nom, cognom = cognom)
+                val response = repo.crear(user)
                 if (response.isSuccessful) {
                     val body = response.body()!!
                     _missatge.value = "Usuari creat!"
-                    _resultat.value = """
-                        ✅ Resposta POST (HTTP 201):
-                        ID generat: ${body.id}
-                        Nom: ${body.name}
-                        Feina: ${body.job}
-                        Creat el: ${body.createdAt}
-                    """.trimIndent()
+                    _resultat.value = "ID: ${body.id}\nNom: ${body.nom} ${body.cognom}"
                 } else {
                     _error.value = "Error POST: ${response.code()}"
                 }
@@ -48,22 +40,16 @@ class FormViewModel : ViewModel() {
         }
     }
 
-    // ── CAS 5: PUT — Actualitzar usuari existent ──────────────────────────
-    fun actualitzar(id: Int, nom: String, feina: String) {
+    fun actualitzar(id: String, nom: String, cognom: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val request = UserRequest(name = nom, job = feina)
-                val response = repo.actualitzar(id, request)
+                val user = User(nom = nom, cognom = cognom)
+                val response = repo.actualitzar(id, user)
                 if (response.isSuccessful) {
                     val body = response.body()!!
                     _missatge.value = "Usuari #$id actualitzat!"
-                    _resultat.value = """
-                        ✅ Resposta PUT (HTTP 200):
-                        Nom actualitzat: ${body.name}
-                        Feina actualitzada: ${body.job}
-                        Actualitzat el: ${body.updatedAt}
-                    """.trimIndent()
+                    _resultat.value = "Nom actualitzat: ${body.nom} ${body.cognom}"
                 } else {
                     _error.value = "Error PUT: ${response.code()}"
                 }

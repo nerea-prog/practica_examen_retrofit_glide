@@ -15,7 +15,7 @@ import com.example.glide.viewmodel.FormViewModel
 class FormActivity : AppCompatActivity() {
 
     private val viewModel: FormViewModel by viewModels()
-    private var userId = 0   // 0 = mode crear, >0 = mode editar
+    private var userId: String? = null
 
     private lateinit var tvMode: TextView
     private lateinit var btnGuardar: Button
@@ -37,20 +37,20 @@ class FormActivity : AppCompatActivity() {
         tvResultat = findViewById(R.id.tvResultat)
         cardResultat = findViewById(R.id.cardResultat)
 
-        userId = intent.getIntExtra("USER_ID", 0)
+        userId = intent.getStringExtra("USER_ID")
         val nomExistent = intent.getStringExtra("USER_NOM") ?: ""
         val jobExistent = intent.getStringExtra("USER_JOB") ?: ""
 
-        if (userId == 0) {
+        if (userId == null) {
             // ── MODE CREAR (POST) ─────────────────────────────────────────
             supportActionBar?.title = "Nou usuari"
-            tvMode.text = "🟦 MODE CREAR → POST api/users"
+            tvMode.text = "🟦 MODE CREAR"
             tvMode.setBackgroundColor(0xFF1565C0.toInt())
             btnGuardar.text = "Crear usuari"
         } else {
             // ── MODE EDITAR (PUT) ─────────────────────────────────────────
             supportActionBar?.title = "Editar usuari #$userId"
-            tvMode.text = "🟩 MODE EDITAR → PUT api/users/$userId"
+            tvMode.text = "🟩 MODE EDITAR"
             tvMode.setBackgroundColor(0xFF2E7D32.toInt())
             btnGuardar.text = "Guardar canvis"
             etNom.setText(nomExistent)
@@ -65,8 +65,12 @@ class FormActivity : AppCompatActivity() {
             if (nom.isEmpty())   { etNom.error = "Camp obligatori";   return@setOnClickListener }
             if (feina.isEmpty()) { etFeina.error = "Camp obligatori"; return@setOnClickListener }
 
-            if (userId == 0) viewModel.crear(nom, feina)
-            else             viewModel.actualitzar(userId, nom, feina)
+            val id = userId
+            if (id == null) {
+                viewModel.crear(nom, feina)
+            } else {
+                viewModel.actualitzar(id, nom, feina)
+            }
         }
 
         viewModel.isLoading.observe(this) { loading ->

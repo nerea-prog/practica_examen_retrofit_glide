@@ -35,10 +35,13 @@ class DetallActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         layoutContingut = findViewById(R.id.layoutContingut)
 
-        val userId  = intent.getIntExtra("USER_ID", -1)
-        val userNom = intent.getStringExtra("USER_NOM") ?: "Usuari #$userId"
+        val userId = intent.getStringExtra("USER_ID")
+        val userNom = intent.getStringExtra("USER_NOM") ?: "Usuari"
 
-        if (userId == -1) { finish(); return }
+        if (userId == null) {
+            finish()
+            return
+        }
 
         supportActionBar?.title = userNom
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -54,7 +57,6 @@ class DetallActivity : AppCompatActivity() {
                 tvEmail.text  = it.email
 
                 // ── GLIDE a la pantalla de detall ─────────────────────────
-                // Imatge més gran, també circular
                 Glide.with(this)
                     .load(it.avatar)
                     .apply(

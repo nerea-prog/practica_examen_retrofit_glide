@@ -17,7 +17,7 @@ class DetallViewModel : ViewModel() {
     val isLoading: LiveData<Boolean> = _isLoading
     val error: LiveData<String?> = _error
 
-    fun cargarUsuari(id: Int) {
+    fun cargarUsuari(id: String) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
