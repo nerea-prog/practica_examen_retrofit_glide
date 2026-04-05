@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="#F0F4F8">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="#1565C0" android:padding="16dp" android:orientation="vertical">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="👥 Glide + Retrofit Demo" android:textColor="#FFFFFF"
+            android:textSize="20sp" android:textStyle="bold"/>
+        <TextView android:id="@+id/tvInfo" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Carregant usuaris de reqres.in..."
+            android:textColor="#BBDEFB" android:textSize="12sp" android:layout_marginTop="4dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="12dp">
+            <Button android:id="@+id/btnRecarregar" android:layout_width="0dp"
+                android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="↺ Recarregar" android:backgroundTint="#0D47A1"
+                android:layout_marginEnd="8dp"/>
+            <Button android:id="@+id/btnNou" android:layout_width="0dp"
+                android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="+ Nou Usuari" android:backgroundTint="#2E7D32"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="💡 Toca la fila → detall amb avatar gran  |  ✏️ Editar  |  🗑️ Eliminar"
+        android:textSize="11sp" android:textColor="#555555"
+        android:padding="10dp" android:background="#E3F2FD"/>
+
+    <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_gravity="center"
+        android:layout_marginTop="40dp" android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/recyclerView"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:padding="8dp" android:clipToPadding="false"/>
+</LinearLayout>
