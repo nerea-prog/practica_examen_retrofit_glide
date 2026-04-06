@@ -5,16 +5,27 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 /**
- * SINGLETON RETROFIT
+ * Singleton que provee la instancia de Retrofit para la API de usuarios ([UsersService]).
  *
- * - companion object → accés estàtic sense instanciar la classe
- * - @Synchronized → thread-safe (evita crear dos objectes alhora)
- * - baseUrl SEMPRE acaba amb /
+ * Este objeto asegura que solo exista una instancia de Retrofit en toda la aplicación.
+ *
+ * Características:
+ * - `companion object` permite acceso estático a la API sin instanciar la clase.
+ * - `@Synchronized` garantiza que la creación sea thread-safe.
+ * - `baseUrl` debe terminar siempre con `/`.
  */
 class UserAPI {
     companion object {
+        /** Instancia única de [UsersService]. */
         private var instance: UsersService? = null
 
+        /**
+         * Retorna la instancia de la API de usuarios.
+         *
+         * Si aún no existe, se crea con Retrofit y Gson para manejar JSON.
+         *
+         * @return Instancia singleton de [UsersService].
+         */
         @Synchronized
         fun API(): UsersService {
             if (instance == null) {
@@ -23,7 +34,7 @@ class UserAPI {
                     .create()
 
                 instance = Retrofit.Builder()
-                    .baseUrl("https://69d229a45043d95be971884b.mockapi.io/")          // ← acaba amb /
+                    .baseUrl("https://69d229a45043d95be971884b.mockapi.io/") // baseUrl termina en /
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build()
                     .create(UsersService::class.java)

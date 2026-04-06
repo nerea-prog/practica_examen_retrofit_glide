@@ -13,6 +13,13 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.glide.R
 import com.example.glide.viewmodel.DetallViewModel
 
+/**
+ * Activity que muestra el detalle completo de un usuario ([User]).
+ *
+ * - Recibe el ID del usuario y su nombre a través de [Intent] extras.
+ * - Observa LiveData del [DetallViewModel] para actualizar la UI en tiempo real.
+ * - Muestra imagen de avatar usando Glide con placeholder y recorte circular.
+ */
 class DetallActivity : AppCompatActivity() {
 
     private val viewModel: DetallViewModel by viewModels()
@@ -28,6 +35,7 @@ class DetallActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detall)
 
+        // ── Inicialización de views ────────────────────────────────
         tvId = findViewById(R.id.tvId)
         tvNom = findViewById(R.id.tvNom)
         tvEmail = findViewById(R.id.tvEmail)
@@ -35,28 +43,27 @@ class DetallActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
         layoutContingut = findViewById(R.id.layoutContingut)
 
+        // ── Recibir parámetros del Intent ─────────────────────────
         val userId = intent.getStringExtra("USER_ID")
         val userNom = intent.getStringExtra("USER_NOM") ?: "Usuari"
 
-        if (userId == null) {
-            finish()
-            return
-        }
+        if (userId == null) { finish(); return }
 
+        // ── Configurar ActionBar ────────────────────────────────
         supportActionBar?.title = userNom
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // Cridar el ViewModel amb l'ID rebut
+        // ── Llamar al ViewModel para cargar usuario ──────────────
         viewModel.cargarUsuari(userId)
 
-        // ── Observar LiveData ─────────────────────────────────────────────
+        // ── Observar LiveData del usuario ───────────────────────
         viewModel.usuari.observe(this) { user ->
             user?.let {
-                tvId.text     = "ID: ${it.id}"
-                tvNom.text    = "${it.nom} ${it.cognom}"
-                tvEmail.text  = it.email
+                tvId.text    = "ID: ${it.id}"
+                tvNom.text   = "${it.nom} ${it.cognom}"
+                tvEmail.text = it.email
 
-                // ── GLIDE a la pantalla de detall ─────────────────────────
+                // ── Cargar avatar con Glide ─────────────────────
                 Glide.with(this)
                     .load(it.avatar)
                     .apply(
@@ -69,15 +76,25 @@ class DetallActivity : AppCompatActivity() {
             }
         }
 
+        // ── Observar estado de carga ───────────────────────────
         viewModel.isLoading.observe(this) { loading ->
             progressBar.visibility = if (loading) View.VISIBLE else View.GONE
             layoutContingut.visibility = if (loading) View.GONE else View.VISIBLE
         }
 
+        // ── Observar errores ───────────────────────────────────
         viewModel.error.observe(this) { err ->
             err?.let { Toast.makeText(this, it, Toast.LENGTH_LONG).show() }
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean { finish(); return true }
+    /**
+     * Maneja la acción de back en el ActionBar.
+     *
+     * @return true siempre, finaliza la activity.
+     */
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
 }
