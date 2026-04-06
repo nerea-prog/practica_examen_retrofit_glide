@@ -21,11 +21,19 @@
             android:padding="12dp" android:textSize="16sp"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Feina / Job" android:textSize="14sp" android:textStyle="bold"
+            android:text="Cognom" android:textSize="14sp" android:textStyle="bold"
             android:textColor="#212121" android:layout_marginTop="16dp" android:layout_marginBottom="4dp"/>
         <EditText android:id="@+id/etFeina" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:hint="p.ex. developer, designer..."
+            android:layout_height="wrap_content" android:hint="p.ex. Garcia, Martí..."
             android:inputType="textCapSentences" android:background="#FFFFFF"
+            android:padding="12dp" android:textSize="16sp"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="URL Avatar (Imatge)" android:textSize="14sp" android:textStyle="bold"
+            android:textColor="#212121" android:layout_marginTop="16dp" android:layout_marginBottom="4dp"/>
+        <EditText android:id="@+id/etAvatar" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:hint="https://ejemplo.com/imagen.jpg"
+            android:inputType="textUri" android:background="#FFFFFF"
             android:padding="12dp" android:textSize="16sp"/>
 
         <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content"
@@ -37,7 +45,7 @@
             android:textSize="16sp" android:layout_marginTop="20dp"
             android:backgroundTint="#1565C0"/>
 
-        <!-- Targeta de resultat (visible després de l'operació) -->
+        <!-- Targeta de resultat -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardResultat"
             xmlns:app="http://schemas.android.com/apk/res-auto"

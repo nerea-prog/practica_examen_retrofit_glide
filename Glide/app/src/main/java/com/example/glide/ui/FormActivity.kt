@@ -13,11 +13,12 @@ import com.example.glide.R
 import com.example.glide.viewmodel.FormViewModel
 
 /**
- * Activity que permite crear o editar un usuario.
+ * Actividad para crear o editar un usuario.
  *
- * - Modo crear (POST) si no se recibe [USER_ID] por intent.
- * - Modo editar (PUT) si se recibe [USER_ID], cargando los datos existentes.
- * - Observa LiveData del [FormViewModel] para mostrar estado de carga, errores y resultados.
+ * - Permite introducir nombre, apellido y URL de avatar.
+ * - En modo creación (userId == null), realiza un POST a la API.
+ * - En modo edición (userId != null), realiza un PUT a la API.
+ * - Muestra el resultado de la operación en una tarjeta informativa.
  */
 class FormActivity : AppCompatActivity() {
 
@@ -27,7 +28,8 @@ class FormActivity : AppCompatActivity() {
     private lateinit var tvMode: TextView
     private lateinit var btnGuardar: Button
     private lateinit var etNom: EditText
-    private lateinit var etFeina: EditText
+    private lateinit var etCognom: EditText
+    private lateinit var etAvatar: EditText
     private lateinit var progressBar: ProgressBar
     private lateinit var tvResultat: TextView
     private lateinit var cardResultat: View
@@ -36,89 +38,77 @@ class FormActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_form)
 
-        // ── Inicializar views ─────────────────────────────────────
+        // ── Inicialización de views ────────────────────────────────
         tvMode = findViewById(R.id.tvMode)
         btnGuardar = findViewById(R.id.btnGuardar)
         etNom = findViewById(R.id.etNom)
-        etFeina = findViewById(R.id.etFeina)
+        etCognom = findViewById(R.id.etFeina) // Se reutiliza el ID del layout anterior
+        etAvatar = findViewById(R.id.etAvatar) // Nuevo campo en el XML (necesitarás añadirlo)
         progressBar = findViewById(R.id.progressBar)
         tvResultat = findViewById(R.id.tvResultat)
         cardResultat = findViewById(R.id.cardResultat)
 
-        // ── Obtener datos del Intent ─────────────────────────────
+        // ── Obtener datos del Intent ──────────────────────────────
         userId = intent.getStringExtra("USER_ID")
         val nomExistent = intent.getStringExtra("USER_NOM") ?: ""
-        val jobExistent = intent.getStringExtra("USER_JOB") ?: ""
+        val cognomExistent = intent.getStringExtra("USER_COGNOM") ?: ""
+        val avatarExistent = intent.getStringExtra("USER_AVATAR") ?: ""
 
-        // ── Configurar modo CREAR o EDITAR según userId ─────────
+        // ── Configurar modo (Crear/Editar) ────────────────────────
         if (userId == null) {
-            // ── Modo crear (POST) ───────────────────────────────
             supportActionBar?.title = "Nou usuari"
             tvMode.text = "🟦 MODE CREAR"
             tvMode.setBackgroundColor(0xFF1565C0.toInt())
             btnGuardar.text = "Crear usuari"
         } else {
-            // ── Modo editar (PUT) ──────────────────────────────
             supportActionBar?.title = "Editar usuari #$userId"
             tvMode.text = "🟩 MODE EDITAR"
             tvMode.setBackgroundColor(0xFF2E7D32.toInt())
             btnGuardar.text = "Guardar canvis"
             etNom.setText(nomExistent)
-            etFeina.setText(jobExistent)
+            etCognom.setText(cognomExistent)
+            etAvatar.setText(avatarExistent)
         }
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // ── Configurar click del botón Guardar ────────────────
+        // ── Lógica del botón guardar ──────────────────────────────
         btnGuardar.setOnClickListener {
-            val nom   = etNom.text.toString().trim()
-            val feina = etFeina.text.toString().trim()
+            val nom    = etNom.text.toString().trim()
+            val cognom = etCognom.text.toString().trim()
+            val avatar = etAvatar.text.toString().trim()
 
-            // ── Validación básica ─────────────────────────────
-            if (nom.isEmpty())   { etNom.error = "Camp obligatori";   return@setOnClickListener }
-            if (feina.isEmpty()) { etFeina.error = "Camp obligatori"; return@setOnClickListener }
+            if (nom.isEmpty())    { etNom.error = "Camp obligatori";    return@setOnClickListener }
+            if (cognom.isEmpty()) { etCognom.error = "Camp obligatori"; return@setOnClickListener }
 
-            // ── Llamar al ViewModel según modo ───────────────
             val id = userId
             if (id == null) {
-                viewModel.crear(nom, feina)
+                viewModel.crear(nom, cognom, avatar)
             } else {
-                viewModel.actualitzar(id, nom, feina)
+                viewModel.actualitzar(id, nom, cognom, avatar)
             }
         }
 
-        // ── Observar estado de carga ─────────────────────────
+        // ── Observar LiveData del ViewModel ───────────────────────
         viewModel.isLoading.observe(this) { loading ->
             progressBar.visibility = if (loading) View.VISIBLE else View.GONE
             btnGuardar.isEnabled   = !loading
         }
 
-        // ── Observar mensajes del ViewModel ─────────────────
         viewModel.missatge.observe(this) { msg ->
             msg?.let { Toast.makeText(this, it, Toast.LENGTH_SHORT).show() }
         }
 
-        // ── Observar resultado de la operación ──────────────
         viewModel.resultat.observe(this) { res ->
             res?.let {
-                tvResultat.text       = it
+                tvResultat.text = it
                 cardResultat.visibility = View.VISIBLE
             }
         }
 
-        // ── Observar errores ─────────────────────────────────
         viewModel.error.observe(this) { err ->
             err?.let { Toast.makeText(this, it, Toast.LENGTH_LONG).show() }
         }
     }
 
-    /**
-     * Maneja la acción de back en el ActionBar.
-     *
-     * @return true siempre, finaliza la activity.
-     */
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
-    }
+    override fun onSupportNavigateUp(): Boolean { finish(); return true }
 }

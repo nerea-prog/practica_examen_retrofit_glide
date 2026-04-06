@@ -6,18 +6,10 @@ import com.example.glide.repository.UserRepository
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel per al formulari de creació i edició d'usuaris.
+ * ViewModel para la pantalla de formulario.
  *
- * Funcions principals:
- * - Crear un usuari nou (POST).
- * - Actualitzar un usuari existent (PUT).
- * - Gestionar l'estat de càrrega, errors i resultats.
- *
- * LiveData exposades:
- * - [isLoading]: indica si s'està realitzant una operació de xarxa.
- * - [error]: missatge d'error en cas de fallada.
- * - [missatge]: missatge d'èxit després d'una operació.
- * - [resultat]: informació detallada de l'usuari creat o actualitzat.
+ * Se encarga de la lógica de creación (POST) y actualización (PUT) de usuarios.
+ * Maneja el envío de datos incluyendo el nombre, apellido y URL del avatar.
  */
 class FormViewModel : ViewModel() {
 
@@ -28,41 +20,29 @@ class FormViewModel : ViewModel() {
     private val _missatge  = MutableLiveData<String?>()
     private val _resultat  = MutableLiveData<String?>()
 
-    /** LiveData observable que indica si hi ha una operació en curs. */
     val isLoading: LiveData<Boolean> = _isLoading
-
-    /** LiveData observable per mostrar missatges d'error. */
     val error:     LiveData<String?> = _error
-
-    /** LiveData observable per mostrar missatges d'èxit. */
     val missatge:  LiveData<String?> = _missatge
-
-    /** LiveData observable amb informació de l'usuari creat o actualitzat. */
     val resultat:  LiveData<String?> = _resultat
 
     /**
-     * Crea un nou usuari.
+     * Crea un nuevo usuario.
      *
-     * @param nom Nom de l'usuari.
-     * @param cognom Cognom de l'usuari.
-     *
-     * Aquesta funció:
-     * - Mostra la ProgressBar establint [_isLoading] a true.
-     * - Crida al [UserRepository] per crear un usuari.
-     * - Si és exitós, actualitza [_missatge] i [_resultat].
-     * - Si falla, actualitza [_error] amb el codi d'error o missatge de connexió.
-     * - Sempre desactiva [_isLoading] al final.
+     * @param nom Nombre del usuario.
+     * @param cognom Apellido del usuario.
+     * @param avatar URL de la imagen del avatar.
      */
-    fun crear(nom: String, cognom: String) {
+    fun crear(nom: String, cognom: String, avatar: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val user = User(nom = nom, cognom = cognom)
+                // Ahora enviamos también la URL del avatar en el objeto User
+                val user = User(nom = nom, cognom = cognom, avatar = avatar)
                 val response = repo.crear(user)
                 if (response.isSuccessful) {
                     val body = response.body()!!
                     _missatge.value = "Usuari creat!"
-                    _resultat.value = "ID: ${body.id}\nNom: ${body.nom} ${body.cognom}"
+                    _resultat.value = "ID: ${body.id}\nNom: ${body.nom} ${body.cognom}\nAvatar: ${body.avatar}"
                 } else {
                     _error.value = "Error POST: ${response.code()}"
                 }
@@ -75,29 +55,24 @@ class FormViewModel : ViewModel() {
     }
 
     /**
-     * Actualitza un usuari existent.
+     * Actualiza un usuario existente.
      *
-     * @param id ID de l'usuari a actualitzar.
-     * @param nom Nou nom de l'usuari.
-     * @param cognom Nou cognom de l'usuari.
-     *
-     * Aquesta funció:
-     * - Mostra la ProgressBar establint [_isLoading] a true.
-     * - Crida al [UserRepository] per actualitzar l'usuari.
-     * - Si és exitós, actualitza [_missatge] i [_resultat].
-     * - Si falla, actualitza [_error] amb el codi d'error o missatge de connexió.
-     * - Sempre desactiva [_isLoading] al final.
+     * @param id ID del usuario a editar.
+     * @param nom Nuevo nombre.
+     * @param cognom Nuevo apellido.
+     * @param avatar Nueva URL del avatar.
      */
-    fun actualitzar(id: String, nom: String, cognom: String) {
+    fun actualitzar(id: String, nom: String, cognom: String, avatar: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val user = User(nom = nom, cognom = cognom)
+                // Enviamos los datos actualizados incluyendo el avatar
+                val user = User(nom = nom, cognom = cognom, avatar = avatar)
                 val response = repo.actualitzar(id, user)
                 if (response.isSuccessful) {
                     val body = response.body()!!
                     _missatge.value = "Usuari #$id actualitzat!"
-                    _resultat.value = "Nom actualitzat: ${body.nom} ${body.cognom}"
+                    _resultat.value = "Nom actualitzat: ${body.nom} ${body.cognom}\nAvatar: ${body.avatar}"
                 } else {
                     _error.value = "Error PUT: ${response.code()}"
                 }
